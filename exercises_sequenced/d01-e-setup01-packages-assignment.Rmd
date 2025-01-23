@@ -41,9 +41,12 @@ cursor.
 
 ### __q3__ What are the main differences between `install.packages()` and `library()`? How often do you need to call each one?
 
+install.packages() installs libraries and library() checks whether the library is installed, what version it is, etc.
 
 <!-- include-exit-ticket -->
 # Exit Ticket
 <!-- -------------------------------------------------- -->
 
 Once you have completed this exercise, make sure to fill out the **exit ticket survey**, [linked here](https://docs.google.com/forms/d/e/1FAIpQLSeuq2LFIwWcm05e8-JU84A3irdEL7JkXhMq5Xtoalib36LFHw/viewform?usp=pp_url&entry.693978880=e-setup01-packages-assignment.Rmd).
+
+
