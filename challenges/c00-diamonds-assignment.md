@@ -98,22 +98,52 @@ document your observations.
 ``` r
 ## TASK: Plot `price` vs `carat` below
 ## Your code here!
+
+diamonds %>%
+  ggplot(aes(carat, price)) +
+  geom_point()
 ```
+
+![](c00-diamonds-assignment_files/figure-gfm/q1-task-1.png)<!-- -->
 
 **Observations**:
 
-- (Write your observations here!)
+There is a positive correlation between carat and price. However, that
+relationship does not seem linear, as there is a spike in the maximum
+price of diamonds once it hits one carat. This suggests that at least
+one other variable is affecting the diamond prices.
+
+Other interesting observations:
+
+- Diamonds can be very cheap or very expensive.
+
+- Bigger diamonds are not very represented in this dataset. This could
+  be because bigger diamonds are rare to come by in real life.
 
 ### **q2** Create a visualization showing variables `carat`, `price`, and `cut` simultaneously. Experiment with which variable you assign to which aesthetic (`x`, `y`, etc.) to find an effective visual.
 
 ``` r
 ## TASK: Plot `price`, `carat`, and `cut` below
 ## Your code here!
+
+diamonds %>%
+  ggplot(aes(x = carat, y = price, colour = cut)) +
+  geom_point()
 ```
+
+![](c00-diamonds-assignment_files/figure-gfm/q2-task-1.png)<!-- -->
 
 **Observations**:
 
-- (Write your observations here!)
+Adding to my previous observation, my hypothesis that another variable
+is at play seems to be true. This graph shows that many ranges have
+almost a color gradient pattern, with “Ideal” quality diamonds often
+being the most expensive and “Fair” quality diamonds being less costly.
+While we most likely cannot pinpoint an exact relationship between carat
+and quality with price, we can most likely determine a range with decent
+accuracy regarding price based on just carat and quality. It also seems
+that higher carat diamonds are more likely to be of lower quality,
+however, there is not enough data points to verify that.
 
 # Communication
 
