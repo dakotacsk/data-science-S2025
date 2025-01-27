@@ -50,9 +50,9 @@ Try this below!
 ## Re-indent these lines
 c(
   "foo",
-    "bar",
-      "goo",
-        "gah"
+  "bar",
+  "goo",
+  "gah"
 )
 ```
 
@@ -62,13 +62,21 @@ c(
 
 - Run the code, don’t display it, but show its results?
 
+echo=FALSE
+
 - Run the code, but don’t display it or its results?
 
+include=FALSE
+
 ### **q3** How do stop the code in a chunk from running once it has started?
+
+click pause.
 
 ### **q4** How do you show the “Document Outline” in RStudio?
 
 *Hint*: Try googling “rstudio document outline”
+
+idk how to do this in mac.
 
 <!-- include-exit-ticket -->
 
