@@ -101,7 +101,8 @@ document your observations.
 
 diamonds %>%
   ggplot(aes(carat, price)) +
-  geom_point()
+  geom_point() + 
+  ggtitle("Price vs Carat of Diamonds") 
 ```
 
 ![](c00-diamonds-assignment_files/figure-gfm/q1-task-1.png)<!-- -->
@@ -128,7 +129,8 @@ Other interesting observations:
 
 diamonds %>%
   ggplot(aes(x = carat, y = price, colour = cut)) +
-  geom_point()
+  geom_point() + 
+  ggtitle("Price vs Carat and Cut of Diamonds") 
 ```
 
 ![](c00-diamonds-assignment_files/figure-gfm/q2-task-1.png)<!-- -->

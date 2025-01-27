@@ -58,7 +58,8 @@ In this first stage, you will explore the `diamonds` dataset and document your o
 
 diamonds %>%
   ggplot(aes(carat, price)) +
-  geom_point()
+  geom_point() + 
+  ggtitle("Price vs Carat of Diamonds") 
 
 ```
 
@@ -80,7 +81,8 @@ Other interesting observations:
 
 diamonds %>%
   ggplot(aes(x = carat, y = price, colour = cut)) +
-  geom_point()
+  geom_point() + 
+  ggtitle("Price vs Carat and Cut of Diamonds") 
 
 ```
 
