@@ -52,13 +52,21 @@ Some nomenclature:
 *Hint*: You can run `?diamonds` to get information on a built-in dataset.
 
 ```{r load-packages, eval=FALSE}
+head(diamonds)
 ```
 
 ### __q2__ Run `glimpse(diamonds)`; what variables does `diamonds` have?
 
+```{r}
+glimpse(diamonds)
+```
 
 ### __q3__ Run `summary(diamonds)`; what are the common values for each of the
 variables? How widely do each of the variables vary?
+
+```{r}
+summary(diamonds)
+```
 
 *Hint*: The `Median` and `Mean` are common values, while `Min` and `Max` give us
 a sense of variation.
@@ -70,6 +78,7 @@ summary(diamonds)
 **Observations**:
 
 - (Write your observations here!)
+It seems like there are a lot of diamonds with the clarity grade of G. However, the dataset seems decently balanced across all columns.
 
 You should always analyze your dataset in the simplest way possible, build
 hypotheses, and devise more specific analyses to probe those hypotheses. The
@@ -103,6 +112,10 @@ turn it into `diamonds %>% glimpse()`.
 ### __q4__ Use the pipe operator to re-write `summary(diamonds)`.
 
 ```{r q4-task}
+
+diamonds %>% 
+  summary()
+
 ```
 
 ## Reading Data
@@ -113,8 +126,8 @@ So far we've only been looking at built-in datasets. Ultimately, we'll want to r
 ### __q5__ Use the function `read_csv()` to load the file `"./data/tiny.csv"`.
 
 ```{r q5-task}
-
-df_q5
+"./data/tiny.csv" %>% read_csv()
+# df_q5
 ```
 
 <!-- include-exit-ticket -->
