@@ -88,7 +88,7 @@ diamonds %>%
 
 **Observations**:
 
-Adding to my previous observation, my hypothesis that another variable is at play seems to be true. This graph shows that many ranges have almost a color gradient pattern, with "Ideal" quality diamonds often being the most expensive and "Fair" quality diamonds being less costly. While we most likely cannot pinpoint an exact relationship between carat and quality with price, we can most likely determine a range with decent accuracy regarding price based on just carat and quality. It also seems that higher carat diamonds are more likely to be of lower quality, however, there is not enough data points to verify that.
+Adding to my previous observation, my hypothesis that another variable is at play seems to be true. This graph shows that many ranges have almost a color gradient pattern, with "Ideal" quality diamonds often being the most expensive and "Fair" quality diamonds being less costly when diamonds are at the same carat weight. While we most likely cannot pinpoint an exact relationship between carat and quality with price, we can most likely determine a range with decent accuracy regarding price based on just carat and quality. It also seems that higher carat diamonds are more likely to be of lower quality, however, there is not enough data points to verify that.
 
 # Communication
 <!-- -------------------------------------------------- -->
