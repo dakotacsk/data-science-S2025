@@ -1,6 +1,6 @@
 ---
 title: "Michelson Speed-of-light Measurements"
-author: "(Your name here)"
+author: "Dakota Chang"
 date: 2020-
 output: 
   github_document:
@@ -85,17 +85,25 @@ df_michelson %>% glimpse()
 
 ```{r q1-task}
 ## TODO: Compute summaries
-df_q1 <- NA
+df_q1 <- df_michelson %>%
+  group_by(Distinctness) %>%
+  summarize(
+    n = n(),
+    MeanVelocity = mean(Velocity)
+  )
+
 df_q1 %>%
   arrange(desc(Distinctness)) %>%
   knitr::kable()
 ```
 
 **Observations**:
+
 - Write your observations here!
-  - (Your response here)
+  - Category 3 in distinctness has more recorded values than 2 and both have more than 1. It also seems that distinctness describes three case scenarios. Potentially with 3 and 2 being more similar to each other, and 1 less similar. This is deduced because the values recorded in distinctness 2 and 3 are closer in value. 
+  
 - Why might your table differ from Michelson's?
-  - (Your response here)
+  - We might be missing a few values, or Michelson might have done some rounding work or removing of errors in his published work.
 
 The `Velocity` values in the dataset are the speed of light *in air*; Michelson
 introduced a couple of adjustments to estimate the speed of light in a vacuum.
@@ -108,7 +116,8 @@ observations in the dataset.
 
 ```{r q2-task}
 ## TODO: Adjust the data, assign to df_q2
-df_q2 <- NA
+df_q2 <- df_michelson %>%
+  mutate(VelocityVacuum = Velocity + 92)
 
 df_q2
 ```
@@ -137,13 +146,21 @@ problems uncertainty includes some amount of human judgment.[2]
 ```{r q3-task}
 ## TODO: Compare Michelson's estimate and error against the true value
 ## Your code here!
+
+true_error <- LIGHTSPEED_VACUUM - LIGHTSPEED_MICHELSON
+michelson_uncertainty <- LIGHTSPEED_PM
+
+true_error
+michelson_uncertainty
 ```
 
 **Observations**:
+
 - Is Michelson's estimate of the error (his uncertainty) greater or less than the true error?
-  - (Your response here)
+  - Michelson's estimate of the error is was *smaller* than true error.
+
 - Make a quantitative comparison between Michelson's uncertainty and his error.
-  - (Your response here)
+  - Michelson's estimate of the speed of light (299944.00 km/s) was 151.542 km/s higher than the modern value (299792.458 km/s). His reported uncertainty (±51 km/s) was smaller than the true error. His uncertainty range did not include the true value. This means there might be additional unaccounted errors in his experiment.
 
 The following plot shows all of Michelson's data as a [control chart](https://en.wikipedia.org/wiki/Control_chart); this sort of plot is common in manufacturing, where it is used to help determine if a manufacturing process is under [statistical control](https://en.wikipedia.org/wiki/Statistical_process_control). Each dot is one of Michelson's measurements, and the grey line connects the mean taken for each day. The same plot also shows simulated data using a probability model. We'll get into statistics later in the course; for now, let's focus on understanding what real and simulated data tend to look like.
 
@@ -207,17 +224,97 @@ df_q2 %>%
 ```
 
 **Observations**:
+
 Similarities
-- (your responses here)
+
+- Both had fluctuations over time
+- The general pattern of variation are somewhat similar
+- Both real and simulated data sets contain numerous individual measurements (black dots) scattered around the trend lines
+
 Differences
-- (your responses here)
+
+- The real data appears to be "sharper" and have more pronounced fluctuations compared to simulated data, which seems smoother
+- The simulated data seems to be "smoother" and have less variation and extreme values
 
 ### __q5__ You have access to a few other variables. Construct a **at least three** visualizations of `VelocityVacuum` against these other factors. Are there other patterns in the data that might help explain the difference between Michelson's estimate and `LIGHTSPEED_VACUUM`?
 
+```{r}
+df_q2 %>%
+  ggplot(aes(x = Distinctness, y = VelocityVacuum)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Velocity (Vacuum) vs. Distinctness",
+    x = "Distinctness",
+    y = "Velocity (in Vacuum, km/s)"
+  )
+
+df_q2 %>%
+  ggplot(aes(x = Temp, y = VelocityVacuum)) +
+  geom_point(size = 0.8) +
+  geom_smooth(method = "lm", color = "steelblue", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "Velocity (Vacuum) vs. Temperature",
+    x = "Temperature (Fahrenheit)",
+    y = "Velocity (in Vacuum, km/s)"
+  )
+
+df_q2 %>%
+  ggplot(aes(x = Date, y = VelocityVacuum)) +
+  geom_line(color = "grey50") +
+  geom_point(size = 0.8) +
+  theme_minimal() +
+  labs(
+    title = "VelocityVacuum vs. Date",
+    x = "Date of Measurement (1879)",
+    y = "Velocity (in Vacuum, km/s)"
+  )
+```
+```{r}
+
+# ANOVA test for Distinctness effect on Velocity
+anova_result <- aov(VelocityVacuum ~ Distinctness, data = df_q2)
+summary(anova_result)
+
+```
+
+```{r}
+library(tidyverse)
+
+
+df_q2_new <- df_q2 %>%
+  mutate(Error = VelocityVacuum - LIGHTSPEED_VACUUM)
+
+ggplot(df_q2_new, aes(x = Error)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", alpha = 0.7, color = "black") +
+  geom_vline(aes(xintercept = 0, color = "Actual Mean Velocity"), linetype = "solid", size = 1.2) +
+  geom_vline(aes(xintercept = LIGHTSPEED_MICHELSON - LIGHTSPEED_VACUUM, color = "Michelson's Estimate"), 
+             linetype = "dotted", size = 1.2) +
+  geom_vline(aes(xintercept = (LIGHTSPEED_MICHELSON - LIGHTSPEED_PM) - LIGHTSPEED_VACUUM, 
+                 color = "Michelson's Lower Bound"), 
+             linetype = "dashed", size = 1.2) +
+  geom_vline(aes(xintercept = (LIGHTSPEED_MICHELSON + LIGHTSPEED_PM) - LIGHTSPEED_VACUUM, 
+                 color = "Michelson's Upper Bound"), 
+             linetype = "dashed", size = 1.2) +
+  scale_color_manual(name = "Reference", 
+                     values = c("Actual Mean Velocity" = "black",
+                                "Michelson's Estimate" = "red",
+                                "Michelson's Lower Bound" = "blue",
+                                "Michelson's Upper Bound" = "blue")) +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Measurement Errors",
+    x = "Error (km/s)",
+    y = "Count",
+    subtitle = "Errors Relative to Michelson’s Actual Mean Velocity"
+  )
+
+```
+
 **Observations**:
 
-- Make sure to record observations on your graphs!
-
+Based on the graphs, we can assume that date has minimal effect on the speed of light, whereas temperature and distinctness seem to have some form of correlation. While the statistical analysis shows that it is not enough to confirm a correlation, we are able to see from the distribution of error graphs that this might be a multimodal distribution. This alludes to a few variables being the driving factor of errors. We also see that his measurements skew right from the official accepted speed of light, so we can safely assume that the driving factors make the light of speed faster rather than slower. More analysis will have to be done on the remaining original dataset to draw meaningful conclusions.
 
 
 ## Bibliography
