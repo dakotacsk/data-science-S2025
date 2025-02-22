@@ -66,8 +66,15 @@ Note that these data are not tidy! The data in this form are convenient for repo
 
 ```{r q1-task}
 ## TASK: Tidy `df_stang`
-df_stang_long <-
-  df_stang
+df_stang_long <- df_stang %>%
+  pivot_longer(
+    cols = starts_with("E_") | starts_with("nu_"),
+    names_to = c(".value", "angle"),
+    names_sep = "_"
+  ) %>%
+  filter(!is.na(E) & !is.na(nu)) %>%  # Remove rows where E or nu is NA
+  filter(E >= 0 & nu >= 0) %>%        # Remove rows where E or nu is negative
+  mutate(angle = as.integer(angle))
 
 df_stang_long
 ```
@@ -103,19 +110,38 @@ print("Very good!")
 
 ```{r q2-task}
 ##
+summary(df_stang_long)
+
+num_alloys <- df_stang_long %>% distinct(alloy) %>% nrow()
+num_alloys
+
+angles_tested <- df_stang_long %>% distinct(angle) %>% pull()
+angles_tested
+
+thicknesses_tested <- df_stang_long %>% distinct(thick) %>% pull()
+thicknesses_tested
 ```
 
 **Observations**:
 
 - Is there "one true value" for the material properties of Aluminum?
-  - (Your response here)
+  - No, there is not one true value for the material properties of Aluminum. 
+  The values of elasticity and Poisson's ratio vary with the alloy, angle, 
+  and thickness of the material.
+  
 - How many aluminum alloys are in this dataset? How do you know?
-  - (Your response here)
+  - There is 1 aluminum alloy in this dataset. I know this because the `num_alloys` 
+  which shows the number of distinct alloys according to name.
+
 - What angles were tested?
-  - (Your response here)
+  - 0, 45, 90
+  
 - What thicknesses were tested?
-  - (Your response here)
-- (Write your own question here)
+  - 0.022 0.032 0.064 0.081
+  
+- What is the range of values for `E` and `nu`?
+  - The range of values for E is 9900 to 10700
+  - The range of values for nu is 0.3100 to 0.3310
 
 ## Visualize
 <!-- ------------------------- -->
@@ -124,11 +150,39 @@ print("Very good!")
 
 ```{r q3-task}
 ## TASK: Investigate your question from q1 here
+# Box Plot of Range of Values for E and nu by Angle
+df_stang_long %>%
+  ggplot(aes(x = as_factor(angle), y = E)) +
+  geom_boxplot() +
+  labs(x = "Angle", y = "Elasticity (E)", title = "Box Plot of Elasticity by Angle") +
+  theme_minimal()
+
+# Box Plot of Range of Values for E and nu by Thickness
+df_stang_long %>%
+  ggplot(aes(x = as_factor(thick), y = E)) +
+  geom_boxplot() +
+  labs(x = "Thickness", y = "Elasticity (E)", title = "Box Plot of Elasticity by Thickness") +
+  theme_minimal()
+
+# Synthesis Plot of the Above, but in Scatter form
+df_stang_long %>%
+  ggplot(aes(x = as_factor(angle), y = E, color = as_factor(thick))) +
+  geom_boxplot() +
+  labs(x = "Angle", y = "Elasticity (E)", title = "Box Plot of Elasticity by Angle and Thickness") +
+  theme_minimal()
+
+# Scatter Plot of the Above
+df_stang_long %>%
+  ggplot(aes(x = as_factor(angle), y = E, color = as_factor(thick))) +
+  geom_point(size = 3) +
+  labs(x = "Angle", y = "Elasticity (E)", title = "Scatter Plot of Elasticity by Angle and Thickness") +
+  theme_minimal()
 ```
 
 **Observations**:
 
-- (Address your question from q1 here)
+- It seems that angle is not a very good predictor of elasticity, as the values are very similar across angles, and the variation is very large. However, it seems that measurements from angle 45 is the most consistent, as the values are very close to each other, with the exception of one outlier. It seems, however, that thickness is a better predictor of elasticity. However, it is not a linear relationship. While the alloy is the most elastic at 0.022, and least elastic at 0.081, the values in between are not consistent, seeing the values for 0.032 and 0.064 are very similar.
+  
 
 ### __q4__ Consider the following statement:
 
@@ -148,9 +202,9 @@ df_stang_long %>%
 **Observations**:
 
 - Does this graph support or contradict the claim above?
-  - (Your response here)
+  - It suggests that there is a slight dependence of elasticity on the thickness of the material, but that could be due to other factors, such as measurement of sample variations. 
 - Is this evidence *conclusive* one way or another?
-  - (Your response here)
+  - No. The differences seen could stem from noise, measurement errors, or other factors. More controlled testing is needed to draw a firm conclusion.
 
 # References
 <!-- -------------------------------------------------- -->
