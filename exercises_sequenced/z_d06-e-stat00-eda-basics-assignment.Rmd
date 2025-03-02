@@ -44,6 +44,9 @@ library(tidyverse)
 to do? Do those simple checks on the diamonds dataset below.
 
 ```{r q0-task}
+
+glimpse(diamonds)
+
 ```
 
 I'm going to walk you through a train of thought I had when studying the
@@ -70,7 +73,8 @@ diamonds %>%
 ```
 
 **Observations**:
-- Write your observations here!
+
+This is not correct - more ideal and less fairs.
 
 ## Hypothesis 2
 
@@ -88,6 +92,8 @@ diamonds %>%
 
 **Observations**:
 - Write your observations here!
+
+this is not an effective graph. IDK
 
 The following is a set of *boxplots*; the middle bar denotes the median, the
 boxes denote the *quartiles* (upper and lower "quarters" of the data), and the
@@ -123,6 +129,8 @@ diamonds %>%
 
 **Observations**:
 - Write your observations here!
+
+
 
 ## Footnotes
 

@@ -38,7 +38,7 @@ your pick!
 
 ```{r q1-task}
 diamonds %>%
-  ## TODO: Use mutate to add the column `carat_cut`
+  mutate(carat_cut = cut_width(carat, width = 0.5, boundary = 0)) %>%
   ggplot(aes(x = carat_cut, y = price)) +
   geom_boxplot()
 ```
@@ -62,6 +62,7 @@ Modify the following code:
 ```{r q2-task}
 ## TODO: Modify the code below to consider only diamonds with carat >= 2
 diamonds %>%
+  filter(carat >= 2) %>%
   count(cut, color) %>%
   ggplot(aes(cut, color, fill = n)) +
   geom_tile()

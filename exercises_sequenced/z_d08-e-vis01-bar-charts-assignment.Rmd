@@ -53,11 +53,14 @@ mpg %>% filter(cty == 20)
 `geom_col()`. There's something fishy about the `hwy` values; what's wrong here?
 
 *Hint*: Try changing the `position` parameter for `geom_col()`.
+```{r}
+?geom_col
+```
 
 ```{r q2-task}
 mpg %>%
   ggplot(aes(x = cty, y = hwy)) +
-  geom_col()
+  geom_col(position="jitter")
 ```
 
 **Observations**:
@@ -71,7 +74,8 @@ visualize `cty` vs `hwy`:
 ## NOTE: Run this chunk for an illustration
 mpg %>%
   ggplot(aes(cty, hwy)) +
-  geom_point()
+  # geom_point()
+  geom_count()
 ```
 
 ### __q3__ The following are two different visualizations of the `mpg` dataset.
@@ -114,22 +118,31 @@ do this in a future exercise.
 ```{r q4-task}
 mpg %>%
   ggplot(aes(x = manufacturer, fill = class), position = "dodge") +
-  geom_bar() +
+  geom_bar(position="dodge") +
   theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 0))
 ```
 
 **Observations**
 - Your observations here!
 
-### __q5__ The following graph is hard to read. What other form of faceting would
-make the visual more convenient to read? Modify the code below with your
-suggested improvement.
+### __q5__ The following graph is hard to read. What other form of faceting would make the visual more convenient to read? Modify the code below with your suggested improvement.
 
 ```{r q5-task}
 mpg %>%
-  ggplot(aes(x = cyl)) +
-  geom_bar() +
-  facet_grid(~ manufacturer)
+  ggplot(aes(x = factor(cyl))) +  
+  geom_bar(fill = "blue") +  
+  labs(
+    title = "Number of Cars by Cylinder Count and Manufacturer",
+    x = "Number of Cylinders",
+    y = "Count"
+  ) +
+  facet_wrap(~ manufacturer) +    
+  theme_linedraw() +              
+  theme(
+    text=element_text(family="Palatino"),
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels
+    strip.text = element_text(size = 10, face = "bold") # Style facet titles
+  )
 ```
 
 <!-- include-exit-ticket -->
