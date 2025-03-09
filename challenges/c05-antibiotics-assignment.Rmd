@@ -76,6 +76,19 @@ In this visual you must show *all three* effectiveness values for *all 16 bacter
 
 ```{r q1.1}
 # WRITE YOUR CODE HERE
+df_long <- df_antibiotics %>%
+  pivot_longer(cols = c(penicillin, streptomycin, neomycin), names_to = "antibiotic", values_to = "effectiveness")
+
+ggplot(df_long, aes(x = reorder(bacteria, -effectiveness), y = effectiveness, fill = antibiotic)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  facet_wrap(~ gram) +
+  scale_y_log10() + 
+  theme_minimal() +
+  labs(title = "Effectiveness of Antibiotics on Bacteria",
+       x = "Bacteria",
+       y = "Effectiveness (log scale)")
+
 ```
 
 #### Visual 2 (All variables)
@@ -86,6 +99,34 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.2}
 # WRITE YOUR CODE HERE
+
+df_clustered <- df_antibiotics %>%
+  mutate(across(penicillin:neomycin, log10))
+
+# Antibiotic effectiveness for clustering
+antibiotic_data <- df_clustered %>%
+  column_to_rownames("bacteria") %>%
+  select(-gram)
+
+# Hierarchical clustering
+dist_matrix <- dist(antibiotic_data, method = "euclidean")
+hclust_result <- hclust(dist_matrix, method = "complete")
+
+# Gram staining for annotation
+annotation_df <- df_clustered %>%
+  select(bacteria, gram) %>%
+  column_to_rownames("bacteria")
+
+library(pheatmap)
+
+pheatmap(antibiotic_data, 
+         clustering_distance_rows = dist_matrix,
+         clustering_method = "complete",
+         annotation_row = annotation_df,
+         scale = "row",  # Scale by row (bacteria)
+         main = "Similarity of Bacteria Based on Antibiotic Resistance",
+         show_rownames = TRUE,
+         show_colnames = TRUE)
 ```
 
 #### Visual 3 (Some variables)
@@ -95,7 +136,14 @@ In this visual you may show a *subset* of the variables (`penicillin`, `streptom
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.3}
-# WRITE YOUR CODE HERE
+ggplot(df_antibiotics, aes(x = gram, y = streptomycin, fill = gram)) +
+  geom_boxplot(alpha = 0.7) +
+  geom_jitter(width = 0.1, alpha = 0.5, color = "black") +  # Jitter to avoid overlap
+  scale_y_log10() +  # Log scale for readability
+  theme_minimal() +
+  labs(title = "Effectiveness of Streptomycin by Gram Classification",
+       x = "Gram Classification",
+       y = "Streptomycin Effectiveness (log scale)")
 ```
 
 #### Visual 4 (Some variables)
@@ -106,6 +154,16 @@ Note that your visual must be *qualitatively different* from *all* of your other
 
 ```{r q1.4}
 # WRITE YOUR CODE HERE
+ggplot(df_antibiotics, aes(x = penicillin, y = neomycin, color = gram, label = bacteria)) +
+  geom_point(size = 3) +
+  geom_text_repel(size = 2) +
+  scale_x_log10() +
+  scale_y_log10() +
+  theme_minimal() +
+  labs(title = "Penicillin vs. Neomycin Effectiveness",
+       x = "Penicillin Effectiveness (log scale)",
+       y = "Neomycin Effectiveness (log scale)",
+       color = "Gram Classification")
 ```
 
 #### Visual 5 (Some variables)
@@ -115,7 +173,16 @@ In this visual you may show a *subset* of the variables (`penicillin`, `streptom
 Note that your visual must be *qualitatively different* from *all* of your other visuals.
 
 ```{r q1.5}
-# WRITE YOUR CODE HERE
+ggplot(df_long, aes(x = antibiotic, y = effectiveness, color = bacteria, group = bacteria)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_y_log10() +
+  facet_wrap(~ gram) +
+  theme_minimal() +
+  labs(title = "Trend of Antibiotic Effectiveness Across Bacteria",
+       x = "Antibiotic",
+       y = "Effectiveness (log scale)",
+       color = "Bacteria")
 ```
 
 ### __q2__ Assess your visuals
@@ -132,11 +199,21 @@ There are **two questions** below; use your five visuals to help answer both Gui
 
 *Observations*
 - What is your response to the question above?
-  - (Write your response here)
+  
+  - The effectiveness of the three antibiotics varies significantly across different bacteria and Gram classifications. Penicillin seems to be the most effective against gram-positive bacteria, whereas streptomycin and neomycin seems to be more effective against gram-negative bacteria. Bacillus, Staphylococcus, Streptococcus, and Diplococcus (Gram-positive genera) show a stronger response to penicillin. Escherichia, Pseudomonas, Klebsiella, and Proteus (Gram-negative genera) tend to be more affected by streptomycin and neomycin. Mycobacterium tuberculosis, show high effectiveness for streptomycin but little response to penicillin or neomycin.
+  
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  
+  - Visual 1
+  
 - Why?
-  - (Write your response here)
+
+The main point of this question is to answer how do the antibiotics vary in EFFECTIVENESS for different generas and grams. This means there are a few things to highlight, as listed in decreasing importance:
+1. Effectiveness
+2. Different genera and Gram stain
+3. Three antibiotics.
+The bar chart uses length to display effectiveness, color hue to identify antibiotics, and position to separate Gram-positive and Gram-negative bacteria. This makes it easy to compare how different antibiotics perform across bacterial genera. The log scale ensures variations are clear while keeping the data readable.
+
 
 #### Guiding Question 2
 
@@ -146,12 +223,17 @@ In 1974 *Diplococcus pneumoniae* was renamed *Streptococcus pneumoniae*, and in 
 
 *Observations*
 - What is your response to the question above?
-  - (Write your response here)
+  
+  - The renaming is a reclassification based on genetic and phenotypic characteristics. According to Google, Diplococcus pneumoniae was found to be more closely related to the Streptococcus genus, leading to its reclassification as Streptococcus pneumoniae. I can see this in graph 2, where Diplococcus is grouped with Streptococcus, and in graph 3, where it is shown to be more similar to Streptococcus than to other genera. In the same graph, we also see that Streptococcus fecalis was not grouped into the Streptococcus genus based on antibiotic resistance. This also suggests that the reclassification was not solely based on antibiotic resistance, but also on genetic and phenotypic characteristics.
+  
 - Which of your visuals above (1 through 5) is **most effective** at helping to answer this question?
-  - (Write your response here)
+  
+  - Visual 4
+  
 - Why?
-  - (Write your response here)
-
+  
+  - The heatmap is the most effective visual for this question because it shows the similarity between bacteria based on their antibiotic resistance profiles. The clustering of bacteria with similar resistance patterns can indirectly reflect their genetic and phenotypic relationships. By clustering bacteria with similar resistance patterns, the heatmap can show how Diplococcus pneumoniae (now Streptococcus pneumoniae) groups with other Streptococcus species. This clustering supports the rationale for reclassification based on shared characteristics. The heatmap uses color saturation and position along a common scale to highlight similarities, making it easier to see relationships between bacteria.
+  
 
 # References
 <!-- -------------------------------------------------- -->
