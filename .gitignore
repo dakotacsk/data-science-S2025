@@ -1,6 +1,13 @@
 # Mac
 .DS_Store
 
+# big datasets
+challenges/ACSDT1Y2018.B01003-Data.csv
+challenges/ACSDT5Y2018.B01003-Data.csv
+
+# assignments
+exercises_sequenced/
+
 # History files
 .Rhistory
 .Rapp.history
