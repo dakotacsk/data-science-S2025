@@ -198,7 +198,7 @@ square $x \in [0, 1]$ and $y \in [0, 1]$.
 ## TASK: Choose a sample size and generate samples
 set.seed(42);
 
-n <- 10000 # Choose a sample size
+n <- 1000 # Choose a sample size
 df_q1 <- tibble(
   x = runif(n, min = 0, max = 1),
   y = runif(n, min = 0, max = 1) 
@@ -330,7 +330,7 @@ df_q3
     ## # A tibble: 1 × 1
     ##   pi_est
     ##    <dbl>
-    ## 1   3.15
+    ## 1   3.16
 
 Use the following to check that you’ve used the correct variable names.
 (NB. This does not check correctness.)
@@ -437,7 +437,7 @@ df_q5
     ## # A tibble: 1 × 2
     ##   pi_lo pi_up
     ##   <dbl> <dbl>
-    ## 1  3.12  3.18
+    ## 1  3.05  3.26
 
 ### **q6** CLT confidence interval
 
@@ -465,7 +465,7 @@ df_q1 %>%
     ## # A tibble: 1 × 4
     ##   pi_est     se pi_lo pi_up
     ##    <dbl>  <dbl> <dbl> <dbl>
-    ## 1   3.15 0.0164  3.12  3.18
+    ## 1   3.16 0.0516  3.05  3.26
 
 **Observations**:
 
