@@ -196,7 +196,9 @@ square $x \in [0, 1]$ and $y \in [0, 1]$.
 
 ``` r
 ## TASK: Choose a sample size and generate samples
-n <- 30 # Choose a sample size
+set.seed(42);
+
+n <- 10000 # Choose a sample size
 df_q1 <- tibble(
   x = runif(n, min = 0, max = 1),
   y = runif(n, min = 0, max = 1) 
@@ -328,7 +330,7 @@ df_q3
     ## # A tibble: 1 × 1
     ##   pi_est
     ##    <dbl>
-    ## 1    3.2
+    ## 1   3.15
 
 Use the following to check that you’ve used the correct variable names.
 (NB. This does not check correctness.)
@@ -409,7 +411,7 @@ df_q4 %>%
 - What is a range of plausible values, based on the sampling
   distribution you’ve generated?
   - The range of plausible values for π based on this sampling
-    distribution appears to be approximately between 2.40-3.60.
+    distribution appears to be approximately between 3.048 - 3.264 .
 
 ### **q5** Bootstrap percentile confidence interval
 
@@ -435,7 +437,7 @@ df_q5
     ## # A tibble: 1 × 2
     ##   pi_lo pi_up
     ##   <dbl> <dbl>
-    ## 1  2.67  3.73
+    ## 1  3.12  3.18
 
 ### **q6** CLT confidence interval
 
@@ -461,9 +463,9 @@ df_q1 %>%
 ```
 
     ## # A tibble: 1 × 4
-    ##   pi_est    se pi_lo pi_up
-    ##    <dbl> <dbl> <dbl> <dbl>
-    ## 1    3.2 0.297  2.62  3.78
+    ##   pi_est     se pi_lo pi_up
+    ##    <dbl>  <dbl> <dbl> <dbl>
+    ## 1   3.15 0.0164  3.12  3.18
 
 **Observations**:
 
@@ -471,8 +473,9 @@ df_q1 %>%
   - (Bootstrap CI: yes or no?) Yes
   - (CLT CI: yes or no?) Yes
 - How closely do your bootstrap CI and CLT CI agree?
-  - Bootstrap range is 2.4-3.6, CLT range is 2.45-3.68. They are very
-    close, but the CLT is slightly wider.
+  - Bootstrap range is 3.048 - 3.264, CLT range is 3.054794-3.257206.
+    They both are very close to each other, with the bootstrap CI being
+    slightly wider.
 - Comment on the width of your CI(s). Would your estimate of $\pi$ be
   good enough for roughly estimating an area (e.g., to buy enough paint
   for an art project)? Would your estimate of $\pi$ be good enough for
