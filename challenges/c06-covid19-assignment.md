@@ -203,32 +203,28 @@ The New York Times is publishing up-to-date data on COVID-19 on
 
 ``` r
 ## TASK: Find the URL for the NYT covid-19 county-level data
-url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties-2020.csv"
-
-# they split it...?
-url_counties1 <- "https://raw.githubusercontent.com/nytimes/covid-19-data/refs/heads/master/us-counties-2021.csv"
-
-url_counties2 <- "https://raw.githubusercontent.com/nytimes/covid-19-data/refs/heads/master/us-counties-2022.csv"
+url_counties <- 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
 ```
 
 Once you have the url, the following code will download a local copy of
 the data, then load the data into R.
 
 ``` r
-# Modified to match the new data
+## NOTE: No need to change this; just execute
+## Set the filename of the data to download
+filename_nyt <- "./data/nyt_counties.csv"
 
-filename_nyt_2020 <- "./data/nyt_counties_2020.csv"
-filename_nyt_2021 <- "./data/nyt_counties_2021.csv"
-filename_nyt_2022 <- "./data/nyt_counties_2022.csv"
+## Download the data locally
+curl::curl_download(
+        url_counties,
+        destfile = filename_nyt
+      )
 
-curl::curl_download(url_counties, destfile = filename_nyt_2020)
-curl::curl_download(url_counties1, destfile = filename_nyt_2021)
-curl::curl_download(url_counties2, destfile = filename_nyt_2022)
-
-df_covid_2020 <- read_csv(filename_nyt_2020)
+## Loads the downloaded csv
+df_covid <- read_csv(filename_nyt)
 ```
 
-    ## Rows: 884737 Columns: 6
+    ## Rows: 2502832 Columns: 6
     ## ── Column specification ────────────────────────────────────────────────────────
     ## Delimiter: ","
     ## chr  (3): county, state, fips
@@ -237,72 +233,6 @@ df_covid_2020 <- read_csv(filename_nyt_2020)
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-df_covid_2021 <- read_csv(filename_nyt_2021)
-```
-
-    ## Rows: 1185373 Columns: 6
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr  (3): county, state, fips
-    ## dbl  (2): cases, deaths
-    ## date (1): date
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-df_covid_2022 <- read_csv(filename_nyt_2022)
-```
-
-    ## Rows: 1188042 Columns: 6
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr  (3): county, state, fips
-    ## dbl  (2): cases, deaths
-    ## date (1): date
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-df_covid <- bind_rows(df_covid_2020, df_covid_2021, df_covid_2022)
-
-write_csv(df_covid, "./data/nyt_counties_combined.csv")
-
-df_covid
-```
-
-    ## # A tibble: 3,258,152 × 6
-    ##    date       county      state      fips  cases deaths
-    ##    <date>     <chr>       <chr>      <chr> <dbl>  <dbl>
-    ##  1 2020-01-21 Snohomish   Washington 53061     1      0
-    ##  2 2020-01-22 Snohomish   Washington 53061     1      0
-    ##  3 2020-01-23 Snohomish   Washington 53061     1      0
-    ##  4 2020-01-24 Cook        Illinois   17031     1      0
-    ##  5 2020-01-24 Snohomish   Washington 53061     1      0
-    ##  6 2020-01-25 Orange      California 06059     1      0
-    ##  7 2020-01-25 Cook        Illinois   17031     1      0
-    ##  8 2020-01-25 Snohomish   Washington 53061     1      0
-    ##  9 2020-01-26 Maricopa    Arizona    04013     1      0
-    ## 10 2020-01-26 Los Angeles California 06037     1      0
-    ## # ℹ 3,258,142 more rows
-
-``` r
-# ## NOTE: No need to change this; just execute
-# ## Set the filename of the data to download
-# filename_nyt <- "./data/nyt_counties.csv"
-# 
-# ## Download the data locally
-# curl::curl_download(
-#         url_counties,
-#         destfile = filename_nyt
-#       )
-# 
-# ## Loads the downloaded csv
-# df_covid <- read_csv(filename_nyt)
-```
 
 You can now re-run the chunk above (or the entire notebook) to pull the
 most recent version of the data. Thus you can periodically re-run this
@@ -335,7 +265,7 @@ df_pop %>% glimpse
 df_covid %>% glimpse
 ```
 
-    ## Rows: 3,258,152
+    ## Rows: 2,502,832
     ## Columns: 6
     ## $ date   <date> 2020-01-21, 2020-01-22, 2020-01-23, 2020-01-24, 2020-01-24, 20…
     ## $ county <chr> "Snohomish", "Snohomish", "Snohomish", "Cook", "Snohomish", "Or…
@@ -457,10 +387,11 @@ data.
 ### **q5** Use the `population` estimates in `df_data` to normalize `cases` and `deaths` to produce per 100,000 counts \[3\]. Store these values in the columns `cases_per100k` and `deaths_per100k`.
 
 ``` r
+## TASK: Normalize cases and deaths
 df_data
 ```
 
-    ## # A tibble: 3,258,152 × 7
+    ## # A tibble: 2,502,832 × 7
     ##    date       county      state      fips  cases deaths population
     ##    <date>     <chr>       <chr>      <chr> <dbl>  <dbl>      <dbl>
     ##  1 2020-01-21 Snohomish   Washington 53061     1      0     786620
@@ -473,10 +404,9 @@ df_data
     ##  8 2020-01-25 Snohomish   Washington 53061     1      0     786620
     ##  9 2020-01-26 Maricopa    Arizona    04013     1      0    4253913
     ## 10 2020-01-26 Los Angeles California 06037     1      0   10098052
-    ## # ℹ 3,258,142 more rows
+    ## # ℹ 2,502,822 more rows
 
 ``` r
-## TASK: Normalize cases and deaths
 df_normalized <- df_data %>%
   mutate(
     cases_per100k = cases / population * 1e5,
@@ -486,7 +416,7 @@ df_normalized <- df_data %>%
 df_normalized
 ```
 
-    ## # A tibble: 3,258,152 × 9
+    ## # A tibble: 2,502,832 × 9
     ##    date       county      state      fips  cases deaths population cases_per100k
     ##    <date>     <chr>       <chr>      <chr> <dbl>  <dbl>      <dbl>         <dbl>
     ##  1 2020-01-21 Snohomish   Washington 53061     1      0     786620       0.127  
@@ -499,7 +429,7 @@ df_normalized
     ##  8 2020-01-25 Snohomish   Washington 53061     1      0     786620       0.127  
     ##  9 2020-01-26 Maricopa    Arizona    04013     1      0    4253913       0.0235 
     ## 10 2020-01-26 Los Angeles California 06037     1      0   10098052       0.00990
-    ## # ℹ 3,258,142 more rows
+    ## # ℹ 2,502,822 more rows
     ## # ℹ 1 more variable: deaths_per100k <dbl>
 
 You may use the following test to check your work.
@@ -614,57 +544,94 @@ include in your summaries,* and justify why!
 
 ``` r
 ## TASK: Compute mean and sd for cases_per100k and deaths_per100k
+
 mean_cases_per100k <- df_normalized %>%
   filter(!is.na(cases_per100k)) %>%
+  filter(
+    date == tail(date)
+  ) %>% 
   pull(cases_per100k) %>%
   mean()
 
 std_cases_per100k <- df_normalized %>%
   filter(!is.na(cases_per100k)) %>%
+  filter(
+    date == tail(date)
+  ) %>% 
   pull(cases_per100k) %>%
   sd()
 
 mean_deaths_per100k <- df_normalized %>%
   filter(!is.na(deaths_per100k)) %>%
+  filter(
+    date == tail(date)
+  ) %>% 
   pull(deaths_per100k) %>%
   mean()
+```
 
+    ## Warning: There was 1 warning in `filter()`.
+    ## ℹ In argument: `date == tail(date)`.
+    ## Caused by warning in `==.default`:
+    ## ! longer object length is not a multiple of shorter object length
+
+``` r
 std_deaths_per100k <- df_normalized %>%
   filter(!is.na(deaths_per100k)) %>%
+  filter(
+    date == tail(date)
+  ) %>% 
   pull(deaths_per100k) %>%
   sd()
+```
 
+    ## Warning: There was 1 warning in `filter()`.
+    ## ℹ In argument: `date == tail(date)`.
+    ## Caused by warning in `==.default`:
+    ## ! longer object length is not a multiple of shorter object length
+
+``` r
+print("")
+```
+
+    ## [1] ""
+
+``` r
 print(str_c("Mean cases per 100k: ", mean_cases_per100k))
 ```
 
-    ## [1] "Mean cases per 100k: 14063.8232362178"
+    ## [1] "Mean cases per 100k: 24773.9814141914"
 
 ``` r
 print(str_c("Std dev cases per 100k: ", std_cases_per100k))
 ```
 
-    ## [1] "Std dev cases per 100k: 11171.3056504276"
+    ## [1] "Std dev cases per 100k: 6232.78871614779"
 
 ``` r
 print(str_c("Mean deaths per 100k: ", mean_deaths_per100k))
 ```
 
-    ## [1] "Mean deaths per 100k: 225.267169259576"
+    ## [1] "Mean deaths per 100k: 375.124201493888"
 
 ``` r
 print(str_c("Std dev deaths per 100k: ", std_deaths_per100k))
 ```
 
-    ## [1] "Std dev deaths per 100k: 185.117264974768"
+    ## [1] "Std dev deaths per 100k: 159.736924292988"
 
 - Which rows did you pick?
-  - I picked all the rows that had a non null number.
+  - I picked all the rows that had a non null number on the most recent
+    date available in the dataset.
 - Why?
-  - I was thinking of weighting it, but I realised that doing it like
-    this can help build a general picture of how each county is
-    performing compared to each other. I wanted to see how the counties
-    were doing in general, and not just the ones that had a lot of
-    cases. I think this really depends on what the goal is.
+  - Computing the mean and sd of cases over a specific date allows us to
+    get a snapshot of the most recent situation. This is important
+    because the pandemic is constantly changing, so we want to compute a
+    sd and mean of a specific date. If we were to compute the mean and
+    sd over all dates, it would be skewed by earlier dates when there
+    were fewer cases and deaths. Thus, in here, I’m only considering the
+    most recent date available in the dataset to get a more accurate
+    picture of the current situation.
 
 ### **q7** Find and compare the top 10
 
@@ -675,33 +642,33 @@ you found in q6. Note any observations.
 
 ``` r
 ## TASK: Find the top 10 max cases_per100k counties; report populations as well
-top_cases <- df_normalized %>%
-  filter(!is.na(cases_per100k)) %>%
-  arrange(desc(cases_per100k)) %>%
+top_cases <- df_normalized %>% 
+  arrange(desc(cases_per100k)) %>% 
+  distinct(fips, .keep_all = TRUE) %>% 
   slice(1:10)
 
 ## TASK: Find the top 10 deaths_per100k counties; report populations as well
-top_deaths <- df_normalized %>%
-  filter(!is.na(deaths_per100k)) %>%
-  arrange(desc(deaths_per100k)) %>%
+top_deaths <- df_normalized %>% 
+  arrange(desc(deaths_per100k)) %>% 
+  distinct(fips, .keep_all = TRUE) %>% 
   slice(1:10)
 
 print(top_cases)
 ```
 
     ## # A tibble: 10 × 9
-    ##    date       county state fips  cases deaths population cases_per100k
-    ##    <date>     <chr>  <chr> <chr> <dbl>  <dbl>      <dbl>         <dbl>
-    ##  1 2022-12-28 Loving Texas 48301   369      1        102       361765.
-    ##  2 2022-12-29 Loving Texas 48301   369      1        102       361765.
-    ##  3 2022-12-30 Loving Texas 48301   369      1        102       361765.
-    ##  4 2022-12-31 Loving Texas 48301   369      1        102       361765.
-    ##  5 2022-12-21 Loving Texas 48301   364      1        102       356863.
-    ##  6 2022-12-22 Loving Texas 48301   364      1        102       356863.
-    ##  7 2022-12-23 Loving Texas 48301   364      1        102       356863.
-    ##  8 2022-12-24 Loving Texas 48301   364      1        102       356863.
-    ##  9 2022-12-25 Loving Texas 48301   364      1        102       356863.
-    ## 10 2022-12-26 Loving Texas 48301   364      1        102       356863.
+    ##    date       county           state fips  cases deaths population cases_per100k
+    ##    <date>     <chr>            <chr> <chr> <dbl>  <dbl>      <dbl>         <dbl>
+    ##  1 2022-05-12 Loving           Texas 48301   196      1        102       192157.
+    ##  2 2022-05-11 Chattahoochee    Geor… 13053  7486     22      10767        69527.
+    ##  3 2022-05-11 Nome Census Area Alas… 02180  6245      5       9925        62922.
+    ##  4 2022-05-11 Northwest Arcti… Alas… 02188  4837     13       7734        62542.
+    ##  5 2022-05-13 Crowley          Colo… 08025  3347     30       5630        59449.
+    ##  6 2022-05-11 Bethel Census A… Alas… 02050 10362     41      18040        57439.
+    ##  7 2022-03-30 Dewey            Sout… 46041  3139     42       5779        54317.
+    ##  8 2022-05-12 Dimmit           Texas 48127  5760     51      10663        54019.
+    ##  9 2022-05-12 Jim Hogg         Texas 48247  2648     22       5282        50133.
+    ## 10 2022-05-11 Kusilvak Census… Alas… 02158  4084     14       8198        49817.
     ## # ℹ 1 more variable: deaths_per100k <dbl>
 
 ``` r
@@ -709,34 +676,56 @@ print(top_deaths)
 ```
 
     ## # A tibble: 10 × 9
-    ##    date       county   state fips  cases deaths population cases_per100k
-    ##    <date>     <chr>    <chr> <chr> <dbl>  <dbl>      <dbl>         <dbl>
-    ##  1 2022-11-11 McMullen Texas 48311   182     10        662        27492.
-    ##  2 2022-11-12 McMullen Texas 48311   182     10        662        27492.
-    ##  3 2022-11-13 McMullen Texas 48311   182     10        662        27492.
-    ##  4 2022-11-14 McMullen Texas 48311   182     10        662        27492.
-    ##  5 2022-11-15 McMullen Texas 48311   182     10        662        27492.
-    ##  6 2022-11-16 McMullen Texas 48311   182     10        662        27492.
-    ##  7 2022-11-17 McMullen Texas 48311   182     10        662        27492.
-    ##  8 2022-11-18 McMullen Texas 48311   182     10        662        27492.
-    ##  9 2022-11-19 McMullen Texas 48311   182     10        662        27492.
-    ## 10 2022-11-20 McMullen Texas 48311   182     10        662        27492.
+    ##    date       county           state fips  cases deaths population cases_per100k
+    ##    <date>     <chr>            <chr> <chr> <dbl>  <dbl>      <dbl>         <dbl>
+    ##  1 2022-02-19 McMullen         Texas 48311   166      9        662        25076.
+    ##  2 2022-04-27 Galax city       Virg… 51640  2551     78       6638        38430.
+    ##  3 2022-03-10 Motley           Texas 48345   271     13       1156        23443.
+    ##  4 2022-04-20 Hancock          Geor… 13141  1577     90       8535        18477.
+    ##  5 2022-04-19 Emporia city     Virg… 51595  1169     55       5381        21725.
+    ##  6 2022-04-27 Towns            Geor… 13281  2396    116      11417        20986.
+    ##  7 2022-02-14 Jerauld          Sout… 46073   404     20       2029        19911.
+    ##  8 2022-03-04 Loving           Texas 48301   165      1        102       161765.
+    ##  9 2022-02-03 Robertson        Kent… 21201   570     21       2143        26598.
+    ## 10 2022-05-05 Martinsville ci… Virg… 51690  3452    124      13101        26349.
     ## # ℹ 1 more variable: deaths_per100k <dbl>
 
 **Observations**:
 
-- It seems that both top 10 lists are in Texas. It also seems that all
-  top 10 are from the same county, because the we are reporting on the
-  same period of time for top 10. Both of these counties also have a
-  very low population, making any number of cases and deaths significant
-  in terms of affecting their cases_per100k and deaths_per100k.
+- The counties with the highest cases and deaths are both located in
+  Texas, and many of the counties featured on the tables are located in
+  the same states (Texas, Alaska, Georgia, and South Dakota being the
+  most apparent ones). This is presumably related to state specific
+  policies and healthcare resources. Proximity to other counties with
+  high case counts may also play a role, as the virus can spread more
+  easily in densely populated areas or areas with less stringent public
+  health measures.
+
+- Every single one of these counties have a population under 100,000,
+  which means that even a small number of cases can lead to a high
+  per-100,000 count. It is important to note that the average county
+  size is around 100,000, whereas the most populated county featured is
+  only 18040.
+
+- The number of cases seem horrible when you look at the per-100,000
+  counts, but when you look at the actual number of cases, they are not
+  that high. For example, in Loving, Texas, the cases per 100k is a
+  whopping 192156,86, butand the actual number of cases is 196. However,
+  the county only has a population of 102, making this data incredibly
+  skewed and potentially inaccurate. The second, third, and fourth
+  values all seem much more plausible, with the cases all being under
+  the population and cases_per100k all around 60000-70000. However, all
+  of these values far exceed the mean cases per 100k of
+  24773.9814141914. This indicates that the standard deviation
+  6232.78871614779 is not large enough to account for the extreme values
+  in Chattahoochee, Georgia, and other counties like it. This suggests
+  that the data may be skewed or that there are outliers that are not
+  being accounted for.
 
 - When did these “largest values” occur?
 
-  - The largest values occurred in the later months of 2022, when
-    everyone thought the pandemic was over. It was also around the time
-    of Thanksgiving and Christmas, when most people tend to congregate
-    and travel.
+  - It seems that the largest case values occur around March to May of
+    2022.
 
 ## Self-directed EDA
 
@@ -769,7 +758,7 @@ essex_cases <- df_normalized %>%
 essex_cases
 ```
 
-    ## # A tibble: 1,027 × 9
+    ## # A tibble: 795 × 9
     ##    date       county state         fips  cases deaths population cases_per100k
     ##    <date>     <chr>  <chr>         <chr> <dbl>  <dbl>      <dbl>         <dbl>
     ##  1 2020-03-10 Essex  Massachusetts 25009     1      0     781024         0.128
@@ -782,7 +771,7 @@ essex_cases
     ##  8 2020-03-17 Essex  Massachusetts 25009     8      0     781024         1.02 
     ##  9 2020-03-18 Essex  Massachusetts 25009    14      0     781024         1.79 
     ## 10 2020-03-19 Essex  Massachusetts 25009    19      0     781024         2.43 
-    ## # ℹ 1,017 more rows
+    ## # ℹ 785 more rows
     ## # ℹ 1 more variable: deaths_per100k <dbl>
 
 ``` r
@@ -796,12 +785,12 @@ essex_cases %>%
   )
 ```
 
-![](c06-covid19-assignment_files/figure-gfm/q8-plot-1.png)<!-- --> I
-wanted to explore Essex County, MA since it is where Andover is. I went
-to boarding school in Andover, but because I was in a boarding school, I
-was not very aware of the nearby COVID cases. In fact, I thought that it
-was mostly over in 2021. I did not realise that there was another peak
-in 2022. I wanted to investigate this further.
+![](c06-covid19-assignment_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+I wanted to explore Essex County, MA since it is where Andover is. I
+went to boarding school in Andover, but because I was in a boarding
+school, I was not very aware of the nearby COVID cases. In fact, I
+thought that it was mostly over in 2021. I did not realise that there
+was another peak in 2022. I wanted to investigate this further.
 
 ``` r
 # Rate of increase plot for essex county
@@ -822,7 +811,8 @@ essex_cases %>%
   )
 ```
 
-![](c06-covid19-assignment_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](c06-covid19-assignment_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
 Here is the graph of the rate of increase in cases in Essex County. It
 allows me to see that the peak in 2022 was very rapid. I wanted to
 investigate this further.
@@ -840,7 +830,8 @@ essex_cases %>%
   )
 ```
 
-![](c06-covid19-assignment_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](c06-covid19-assignment_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
 It seems here that the peak happened around 2 weeks after Christmas. I
 believe that this might be due to lowered caution, and a general sense
 of “we are done with this” attitude. I also think that the fact that it
@@ -879,26 +870,24 @@ Massachusetts.
 
 ``` r
 ## NOTE: No need to change this; just an example
-df_normalized %>%
-  filter(
-    state == "Massachusetts", # Focus on Mass only
-    !is.na(fips), # fct_reorder2 can choke with missing data
-  ) %>%
-
-  ggplot(
-    aes(date, cases_per100k, color = fct_reorder2(county, date, cases_per100k))
-  ) +
-  geom_line() +
-  # scale_y_log10(labels = scales::label_number_si()) +
-  scale_color_discrete(name = "County") +
-  theme_minimal() +
-  labs(
-    x = "Date",
-    y = "Cases (per 100,000 persons)"
-  )
+# df_normalized %>%
+#   filter(
+#     state == "Massachusetts", # Focus on Mass only
+#     !is.na(fips), # fct_reorder2 can choke with missing data
+#   ) %>%
+# 
+#   ggplot(
+#     aes(date, cases_per100k, color = fct_reorder2(county, date, cases_per100k))
+#   ) +
+#   geom_line() +
+#   scale_y_log10(labels = scales::label_number_si()) +
+#   scale_color_discrete(name = "County") +
+#   theme_minimal() +
+#   labs(
+#     x = "Date",
+#     y = "Cases (per 100,000 persons)"
+#   )
 ```
-
-![](c06-covid19-assignment_files/figure-gfm/ma-example-1.png)<!-- -->
 
 *Tricks*:
 
