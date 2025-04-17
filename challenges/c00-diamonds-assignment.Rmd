@@ -1,7 +1,7 @@
 ---
 title: "Getting Started: Diamonds"
-author: "(Your name here)"
-date: 2020-
+author: "Dakota Chang"
+date: 2025-04-17
 output:
   github_document:
     toc: true
@@ -71,7 +71,7 @@ Other interesting observations:
 
 - Diamonds can be very cheap or very expensive.
 
-- Bigger diamonds are not very represented in this dataset. This could be because bigger diamonds are rare to come by in real life.
+- Diamonds bigger than 3 carats are not very represented in this dataset. This could be because enormous diamonds are rare to come by in real life.
 
 ### __q2__ Create a visualization showing variables `carat`, `price`, and `cut` simultaneously. Experiment with which variable you assign to which aesthetic (`x`, `y`, etc.) to find an effective visual.
 
