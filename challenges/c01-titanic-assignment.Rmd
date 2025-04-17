@@ -96,11 +96,11 @@ df_titanic %>% summarize(total = sum(n))
 
 - Write your observations here
 
-  - There are 3327 people on board.
+  - There are 2240 people on board.
 
 - Are there any differences?
 
-  - The dataset has 2201 people, which means at least 1/3 of the people on board is not accounted for here.
+  - The dataset has 2201 people, which means 39 people on board is not accounted for here.
 
 - If yes, what might account for those differences?
   - Unwillingness to be part of this data set
@@ -156,41 +156,31 @@ df_prop
 ### __q4__ Replicate your visual from q3, but display `Prop` in place of `n`. Document your observations, and note any new/different observations you make in comparison with q3. Is there anything *fishy* in your plot?
 
 ```{r q4-task}
-
-df_titanic %>%
-  group_by(Class, Sex) %>%
-  mutate(
-    Total = sum(n),
-  ) %>% 
-  ungroup() %>% 
-  filter(Survived == "Yes") %>%
-  mutate(
-    Prop = n / Total
-  ) %>%
-  ggplot(aes(x = Class, y = Prop, fill = Sex)) +
-  geom_col(position = "dodge") +
+df_prop %>% 
+  filter(Survived == "Yes") %>% 
+  ggplot() +
+  geom_col(mapping = aes(x = Class, y = Prop, fill = Sex), position = "dodge")+
   theme(
-    text = element_text(family = "Palatino"),
-    axis.text.x = element_text(angle = 0, hjust = 1),
-    strip.text = element_text(size = 10, face = "bold")
+    text=element_text(family="Palatino"),
+    axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels
+    strip.text = element_text(size = 10, face = "bold") # Style facet titles
   ) +
   labs(
-    title = "Survival Proportions for Class and Sex",
+    title = "Survival Counts for Class and Sex",
     x = "Classes",
-    y = "Proportions"
+    y = "Survival Count"
   )
-
 ```
 
 **Observations**:
 
 - Write your observations here.
 
-It seems the survival proportions for females are much higher than males across the board. It also appears that passengers in the 1st class have the highest rate of survival, with the crew coming in second, 2nd class in third, and 3rd class in last. We can reasonably deduce that females had a higher chance of survival due to external factors, such as prioritized evacuation or heightened survival skills in this particular scenario. However, we cannot determine the exact reason, as the only other factor influencing survival is social class and whether one is part of the crew.
+First class and second class both have a 100% survival rate. Third class has the lowest survival rates, although third class males are more likely to survive than males in crew. Females are more likely to survive regardless of tier (disregarding 1st and 2nd).
 
 - Is there anything *fishy* going on in your plot?
 
-In terms of plotting... no, I believe the graph answers my question. However, in terms of life, I'm wondering why it seems people in 1st class have such a disproportionately high rate of survival.
+In the graph we observe that there is a 100% survival rate for both 1st and 2nd class passengers, which we know is not true according to the dataset.
 
   
 
