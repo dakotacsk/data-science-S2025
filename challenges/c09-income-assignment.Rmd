@@ -50,7 +50,7 @@ library(tidyverse)
 
 ```{r q1-task}
 ## TODO: Give the filename for your copy of Table B01003
-filename_pop <- NA_character_
+filename_pop <- 'ACSDT5Y2018.B01003-Data.csv' # replace with your filename
 
 ## NOTE: No need to edit
 df_pop <-
@@ -80,7 +80,7 @@ This means that for cases listed as `*****` the US Census Bureau recommends trea
 
 ```{r q2-task}
 ## TODO: Give the filename for your copy of Table S1903
-filename_income <- NA_character_
+filename_income <- "ACSST5Y2018.S1903-Data.csv"
 
 ## NOTE: No need to edit
 df_income <-
@@ -120,8 +120,20 @@ df_q3 <-
     contains("median") & matches("\\d-person families") & !contains("Annotation of")
   ) %>%
   mutate(across(contains("median"), as.numeric)) %>%
-## TODO: Pivot the data, rename the columns
+## TODO: Pivot the data, rename the columns 
+  pivot_longer(
+    cols = -c(Geography, `Geographic Area Name`),
+    names_to = c(".value", "category"),
+    names_pattern = "(Estimate|Margin of Error)!!.*!!(\\d-person families)"
+  ) %>%
+  rename(
+    geographic_area_name = `Geographic Area Name`,
+    income_estimate = Estimate,
+    income_moe = `Margin of Error`
+  ) %>%
   glimpse()
+
+df_q3
 ```
 
 Use the following tests to check your work:
@@ -151,8 +163,13 @@ $$\text{MOE} = 1.645 \times \text{SE}.$$
 ### __q4__ Convert the margin of error to standard error. Additionally, compute a 99% confidence interval on income, and normalize the standard error to `income_CV = income_SE / income_estimate`. Provide these columns with the names `income_SE, income_lo, income_hi, income_CV`.
 
 ```{r q4-task}
-
-df_q4
+df_q4 <- df_q3 %>%
+  mutate(
+    income_SE = income_moe / 1.645,  # Convert MOE to SE
+    income_lo = income_estimate - 2.576 * income_SE,  # 99% CI lower bound
+    income_hi = income_estimate + 2.576 * income_SE,  # 99% CI upper bound
+    income_CV = income_SE / income_estimate  # Coefficient of Variation
+  )
 ```
 
 Use the following tests to check your work:
@@ -208,7 +225,8 @@ One last wrangling step: We need to join the two datasets so we can compare popu
 ```{r q5-task}
 ## TODO: Join df_q4 and df_pop by the appropriate column
 
-df_data
+df_data <- df_q4 %>% 
+  left_join(df_pop, by="Geography")
 ```
 
 # Analysis
@@ -246,13 +264,14 @@ df_data %>%
 **Observations**:
 
 - Document your observations here.
-  - (Your response here)
-  - (Your response here)
-  - ...
+  - It seems that most 2-person families have a very low margin of error compared to the 5 or 6-person families, indicating that the estimates for 2-person families are more precise. We can also see that 2-person-families tend to make less than families with more people. There is also a very large margin for Nantucket across all categories compared to other counties, indicating that the estimates for Nantucket are less precise. 
+
 - Can you confidently distinguish between household incomes in Suffolk county? Why or why not?
-  - (Your response here)
+  
+  - No, we cannot confidently distinguish between household incomes in Suffolk county because the confidence intervals for the different family sizes overlap significantly. For example, the true median income for 2-person families could be less than, equal to, or greater than that of 3-person families, and vice versa. The overlapping confidence intervals indicate that the estimates are not statistically different from each other.
+  
 - Which counties have the widest confidence intervals?
-  - (Your response here)
+  - Nantucket County.
 
 In the next task you'll investigate the relationship between population and uncertainty.
 
@@ -261,14 +280,27 @@ In the next task you'll investigate the relationship between population and unce
 *Hint*: Remember that standard error is a function of *both* variability (e.g. variance) and sample size.
 
 ```{r q7-task}
+df_data %>%
+  ggplot(aes(population_estimate, income_SE)) +
+  geom_point(alpha = 0.3) +
+  scale_x_log10() + 
+  scale_y_log10() +
+  geom_smooth(method = "lm") +
+  labs(
+    x = "Population (log scale)",
+    y = "Standard Error of Income Estimate (log scale)",
+    title = "Standard Error vs Population Size"
+  )
+
 ```
 
 **Observations**:
 
 - What *overall* trend do you see between `SE` and population? Why might this trend exist?
-  - (Your response here)
+  - There is an overall trend of decreasing standard error (SE) as population size increases. Since the graph is log scaled for visibility, this indicates a power-law relationship, where larger populations tend to have smaller standard errors. This trend exists because the Census Bureau collects samples that are proportional to the target population size. As a result, areas with larger populations will have a larger sample sizes. Since standard error is inversely related to the square root of the sample size, this leads to smaller SEs for larger populations and thus more precise estimates. 
+
 - What does this *overall* trend tell you about the relative ease of studying small vs large counties?
-  - (Your response here)
+  - It suggests that studying small counties is generally more difficult in terms of obtaining precise estimates, as they tend to have larger standard errors. This is likely due to the smaller sample sizes and greater variability in the data for small populations. In contrast, larger counties provide more data points, leading to more reliable and precise estimates. Basically, smaller counties are harder to study and get precise results.
 
 # Going Further
 <!-- ----------------------------------------------------------------------- -->
@@ -278,12 +310,65 @@ Now it's your turn! You have income data for every county in the United States: 
 ### __q8__ Pose your own question about the data. Create a visualization (or table) here, and document your observations.
 
 ```{r q8-task}
-## TODO: Pose and answer your own question about the data
+
+# Are counties with lower than average income more likely to have smaller families?
+
+# Define income thresholds (top/bottom 20%)
+income_cutoffs <- df_data %>%
+  summarise(
+    bottom_20 = quantile(income_estimate, 0.2, na.rm = TRUE),
+    top_20 = quantile(income_estimate, 0.8, na.rm = TRUE)
+  )
+
+# Create and plot the data
+df_data %>%
+  mutate(
+    income_group = case_when(
+      income_estimate <= income_cutoffs$bottom_20 ~ "Bottom 20%",
+      income_estimate >= income_cutoffs$top_20 ~ "Top 20%",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(income_group)) %>%
+  group_by(category, income_group) %>%
+  summarise(
+    count = n(),
+    .groups = "drop"
+  ) %>%
+  group_by(income_group) %>%
+  mutate(
+    pct = count / sum(count) * 100,
+    category = fct_relevel(category, "1-person families", "2-person families", 
+                          "3-person families", "4-person families")
+  ) %>%
+  ggplot(aes(x = category, y = pct, fill = income_group)) +
+  geom_col(position = position_dodge(), width = 0.7) +
+  geom_text(
+    aes(label = paste0(round(pct, 1), "%")),
+    position = position_dodge(width = 0.7),
+    vjust = -0.5,
+    size = 3
+  ) +
+  scale_fill_manual(
+    values = c("Top 20%" = "#bbddff", "Bottom 20%" = "#ffbbdd"),
+    name = "Income Group:"
+  ) +
+  labs(
+    x = "Family Size",
+    y = "Percentage of Counties",
+    title = "Family Size Distribution in Highest vs Lowest Income Counties",
+    subtitle = "Counties in top and bottom 20% of median income"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  ) 
 ```
 
 **Observations**:
 
-- Document your observations here
+- Bigger households tend to reside in counties with higher median incomes, while smaller households are more common in counties with lower median incomes. This trend is consistent across the top and bottom 20% of income groups. This can be hypothesized as larger households cost more, and thus tend to be found in wealthier areas where families can afford larger living spaces and expenses. Conversely, smaller households may be more prevalent in lower-income areas due to economic constraints, as individuals or couples may not have the financial means to support larger families. 
 
 Ideas:
 

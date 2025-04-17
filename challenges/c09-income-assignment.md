@@ -552,8 +552,12 @@ df_data %>%
     population size increases. Since the graph is log scaled for
     visibility, this indicates a power-law relationship, where larger
     populations tend to have smaller standard errors. This trend exists
-    because larger populations generally provide more data points, which
-    leads to more precise estimates.
+    because the Census Bureau collects samples that are proportional to
+    the target population size. As a result, areas with larger
+    populations will have a larger sample sizes. Since standard error is
+    inversely related to the square root of the sample size, this leads
+    to smaller SEs for larger populations and thus more precise
+    estimates.
 - What does this *overall* trend tell you about the relative ease of
   studying small vs large counties?
   - It suggests that studying small counties is generally more difficult
