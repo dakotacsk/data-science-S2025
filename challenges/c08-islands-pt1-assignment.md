@@ -1,7 +1,7 @@
 The Islands, Part 1: Design
 ================
-(Your name here)
-202X-XX-XX
+Dakota Chang
+2025-04-17
 
 - [Grading Rubric](#grading-rubric)
   - [Individual](#individual)
@@ -132,17 +132,19 @@ you still need to count, because your numbers *will* be different!
 
 - What percent of homes are *occupied*?
 
-  - 2.903811
+  - 97.096189
 
 - Are there any sources of *real* uncertainty in the percent occupied
   you calculated?
 
-  - Yes, I could have counted wrong.
+  - Yes, although I counted every single house, the number of unoccupied
+    homes could change at any time as people of Helvig move out, leave
+    their houses, or die.
 
 - Are there any sources of *erroneous* uncertainty in the percent
   occupied you calculated?
 
-  - No, this is a census data as everyone is accounted for.
+  - Yes, I could have counted wrong.
 
 Zach looked at the first 25 homes in Helvig and recorded the `age` and
 `name` of every person in those homes. These people are provided in
