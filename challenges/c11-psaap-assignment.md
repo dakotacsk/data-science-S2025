@@ -615,8 +615,8 @@ bind_rows(
   - q4 model is much more confident.
 - How many predictors does the `fit_simple` model need in order to make
   a prediction? What about your model `fit_q4`?
-  - `fit_simple` only uses `x` whereas `fit_q4` uses `idx`, `avg_q`,
-    `avg_T`, and `rms_T`.
+  - `fit_simple` only uses 1 prediction, `x`, whereas `fit_q4` uses 4
+    predictions, `idx`, `avg_q`, `avg_T`, and `rms_T`.
 
 Based on these results, you might be tempted to always throw every
 reasonable variable into the model. For some cases, that might be the
@@ -678,26 +678,69 @@ pr_level <- 0.8
 #        use the validation data to check your uncertainty estimates, and 
 #        make a recommendation on a *dependable range* of values for T_norm
 #        at the point `df_design`
-fit_q6 <- NA
+fit_q6 <- 
+  df_train %>% 
+  lm(formula = T_norm ~ x + L + W + U_0)
+
+df_prediction <-
+  df_design %>%
+  add_uncertainties(fit_q6, interval = "prediction", level = pr_level)
+
+df_prediction
 ```
+
+    ## # A tibble: 1 × 7
+    ##       x     L     W   U_0 pred_fit pred_lwr pred_upr
+    ##   <dbl> <dbl> <dbl> <dbl>    <dbl>    <dbl>    <dbl>
+    ## 1     1   0.2  0.04     1     1.88     1.46     2.30
+
+``` r
+df_validate_pi <- df_validate %>%
+  add_uncertainties(fit_q6, interval = "prediction", level = pr_level, prefix = "pi")
+
+coverage <- df_validate_pi %>%
+  mutate(in_interval = T_norm >= pi_lwr & T_norm <= pi_upr) %>%
+  summarize(coverage = mean(in_interval))
+
+coverage
+```
+
+    ## # A tibble: 1 × 1
+    ##   coverage
+    ##      <dbl>
+    ## 1    0.933
 
 **Recommendation**:
 
 - How much do you trust your model? Why?
-  - (Your response here)
+  - I trust it moderately. It is a simple model that only uses 4
+    predictors, and it is based on the training data. However, I am not
+    sure how well it will generalize to new data.
 - What kind of interval—confidence or prediction—would you use for this
   task, and why?
-  - (Your response here)
+  - I would use the prediction interval because the team is trying to
+    predict the range of actual T_norm outcomes in the real world, not
+    just the mean trend. By using the prediction interval we can account
+    for real-world randomness.
 - What fraction of validation cases lie within the intervals you
   predict? (NB. Make sure to calculate your intervals *based on the
   validation data*; don’t just use one single interval!) How does this
   compare with `pr_level`?
-  - (Your response here)
+  - About 93.3% of validation cases fall within the predicted 80%
+    prediction interval. This means the interval is conservative (a bit
+    wider than necessary) but that’s not a bad thing for engineering
+    design where safety margins are valuable.
 - What interval for `T_norm` would you recommend the design team to plan
   around?
-  - (Your response here)
+  - I would recommend they plan around a T_norm range of \[1.457,
+    2.296\], which gives them a reliable performance band based on
+    current design settings and typical variability in the other
+    factors.
 - Are there any other recommendations you would provide?
-  - (Your response here)
+  - Yes. I would recommend that the design team consider the impact of
+    the other impactful variables (e.g. I_0, d_p, or h). Something like
+    a sensitivity analysis could help figure out which one is the most
+    important one to focus on.
 
 *Bonus*: One way you could take this analysis further is to recommend
 which other variables the design team should tightly control. You could
