@@ -341,7 +341,6 @@ Question
 Do out of state plates invite more searches?
 
 ```{r}
-# First, create a variable for out-of-state plates
 df_q9 <- df_data %>%
   mutate(
     out_of_state = vehicle_registration_state != "MA",
