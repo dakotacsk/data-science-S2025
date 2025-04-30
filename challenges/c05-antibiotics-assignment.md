@@ -160,15 +160,16 @@ is Gram positive or negative.
 df_long <- df_antibiotics %>%
   pivot_longer(cols = c(penicillin, streptomycin, neomycin), names_to = "antibiotic", values_to = "effectiveness")
 
-ggplot(df_long, aes(x = reorder(bacteria, -effectiveness), y = effectiveness, fill = antibiotic)) +
+df_long %>%
+  ggplot(aes(x = bacteria, y = effectiveness, fill = antibiotic)) +
   geom_bar(stat = "identity", position = "dodge") +
-  coord_flip() +
-  facet_wrap(~ gram) +
-  scale_y_log10() + 
+  facet_wrap(~ gram, scales = "free_x") +
+  scale_y_log10() +
   theme_minimal() +
-  labs(title = "Effectiveness of Antibiotics on Bacteria",
+  labs(title = "Effectiveness of Antibiotics on Bacteria by Gram Classification",
        x = "Bacteria",
-       y = "Effectiveness (log scale)")
+       y = "Effectiveness (log scale)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.1-1.png)<!-- -->
@@ -274,23 +275,17 @@ Note that your visual must be *qualitatively different* from *all* of
 your other visuals.
 
 ``` r
-ggplot(df_long, aes(x = antibiotic, y = effectiveness, color = bacteria, group = bacteria)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
+df_long %>%
+  ggplot(aes(x = antibiotic, y = effectiveness, fill = antibiotic)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ bacteria, scales = "free_y") +
   scale_y_log10() +
-  facet_wrap(~ gram) +
   theme_minimal() +
-  labs(title = "Trend of Antibiotic Effectiveness Across Bacteria",
+  labs(title = "Antibiotic Effectiveness by Bacteria",
        x = "Antibiotic",
-       y = "Effectiveness (log scale)",
-       color = "Bacteria")
+       y = "Effectiveness (log scale)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
-    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `linewidth` instead.
-    ## This warning is displayed once every 8 hours.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
 
 ![](c05-antibiotics-assignment_files/figure-gfm/q1.5-1.png)<!-- -->
 
@@ -369,7 +364,7 @@ and in 1984 *Streptococcus fecalis* was renamed *Enterococcus fecalis*
 - Which of your visuals above (1 through 5) is **most effective** at
   helping to answer this question?
 
-  - Visual 4
+  - Visual 2
 
 - Why?
 
