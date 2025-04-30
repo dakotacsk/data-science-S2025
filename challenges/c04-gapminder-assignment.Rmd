@@ -109,21 +109,10 @@ gapminder_1952 <- gapminder %>% filter(year == year_min)
 
 ggplot(gapminder_1952, aes(x = continent, y = gdpPercap)) +
   geom_boxplot() +
-  labs(title = "GDP per Capita by Continent (1952)",
+  scale_y_log10() +  # <--- NEW
+  labs(title = "GDP per Capita by Continent (1952, Log Scale)",
        x = "Continent",
-       y = "GDP per Capita") +
-  theme_minimal()
-
-outlier <- gapminder %>% filter(year == year_min) %>% filter(gdpPercap >= 30000)
-print(outlier)
-
-gapminder_1952 <- gapminder %>% filter(year == year_min) %>% filter(gdpPercap <= 30000)
-
-ggplot(gapminder_1952, aes(x = continent, y = gdpPercap)) +
-  geom_boxplot() +
-  labs(title = "GDP per Capita by Continent (1952)",
-       x = "Continent",
-       y = "GDP per Capita") +
+       y = "GDP per Capita (log scale)") +
   theme_minimal()
 
 library(maps)
@@ -150,7 +139,12 @@ map_data <- world_map %>%
 
 ggplot(map_data, aes(x = long, y = lat, group = group, fill = gdpPercap)) +
   geom_polygon(color = "white", size = 0.1) +
-  scale_fill_gradient(low = "lightblue", high = "darkblue", na.value = "gray", name = "GDP per Capita") +
+  scale_fill_gradient(
+    low = "lightblue", 
+    high = "darkblue", 
+    na.value = "gray", 
+    name = "GDP per Capita"
+    ) +
   labs(title = "GDP per Capita by Country (1952)",
        subtitle = "Data from Gapminder",
        caption = "Gray areas indicate missing data") +
@@ -167,7 +161,7 @@ ggplot(map_data, aes(x = long, y = lat, group = group, fill = gdpPercap)) +
 
 **Difficulties & Approaches**:
 
-- Unedited graph of data was very hard to read because of one specific outlier from Asia. -> I removed the outlier from the visualization. I also printed the outlier to inspect which country it is from. The country is Kuwait. According to Wikipedia, "By 1952, the country became the largest oil exporter in the Persian Gulf. This massive growth attracted many foreign workers, especially from Palestine, Egypt, Iran, and India." However, Kuwait was still a British protectorate at that time. The country was not independent until 1961. So, the data is not very reliable. I removed the outlier from the visualization.
+- Originally, the plot was difficult to read due to a wide range in GDP values. Rather than remove Kuwait (a legitimate data point with high GDP), I used a logarithmic y-axis to better visualize variation across countries. This reveals that GDP per capita was skewed toward lower values in 1952, but outliers like Kuwait, the US, and Switzerland stood out significantly.
 
 ### __q3__ You should have found *at least* three outliers in q2 (but possibly many more!). Identify those outliers (figure out which countries they are).
 
@@ -219,11 +213,34 @@ gapminder %>%
 
 ```{r q4-task}
 ## TASK: Create a visual of gdpPercap vs continent
+outlier_countries <- outliers_1952$country
+
+gapminder_years <- gapminder %>%
+  filter(year %in% c(year_min, year_max))
+
+ggplot(gapminder_years, aes(x = continent, y = gdpPercap)) +
+  geom_boxplot() +
+  geom_point(
+    data = gapminder_years %>% filter(country %in% outlier_countries),
+    aes(color = country),
+    size = 2
+  ) +
+  scale_y_log10() +
+  facet_wrap(~ year) +
+  labs(title = "GDP per Capita by Continent: 1952 vs 2007 (Log Scale)",
+       x = "Continent", y = "GDP per Capita (log scale)",
+       color = "Outlier Country") +
+  theme_minimal()
+
 ```
 
 **Observations**:
 
-- Write your observations here
+- The log scale makes it easier to see patterns across continents without the visual distortion caused by extreme outliers.
+- In 1952, the data shows huge disparities—countries like Kuwait, Switzerland, and the US were already far ahead of the rest. Most other countries had GDP per capita values tightly clustered at the lower end.
+- By 2007, the every country shifted upward. Asia sees a big rise, Europe, Americas, and Oceania saw a general rise. There are still no outliers for Oceania.
+- Even though outliers still exist, the overall range difference is smaller compared to before.
+- This view suggests global economic growth, but also shows that some countries remain significantly ahead of others.
 
 # Your Own EDA
 <!-- -------------------------------------------------- -->
@@ -316,7 +333,10 @@ combined_data_normalized <- combined_data %>%
 # Calculate average normalized GDP per capita for top 5 and bottom 5
 average_data <- combined_data_normalized %>%
   group_by(group, year) %>%
-  summarize(avg_gdpPercap_normalized = mean(gdpPercap_normalized, na.rm = TRUE), .groups = "drop")
+  summarize(
+    avg_gdpPercap_normalized = mean(gdpPercap_normalized, na.rm = TRUE),
+    .groups = "drop"
+    )
 
 # Plot the averages on the same graph
 ggplot(average_data, aes(x = year, y = avg_gdpPercap_normalized, color = group)) +
