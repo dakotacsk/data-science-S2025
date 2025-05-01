@@ -277,11 +277,9 @@ of fluid, for different experimental settings (e.g. different dimensions
 ##       each identified by different values of idx
 
 df_psaap %>% 
-  ggplot(aes(T_norm)) +
-  geom_boxplot() +
-  facet_grid(~ x) +
-  coord_flip() +
-  ggtitle("T_norm vs Channel Location") +
+  ggplot(aes(x = x, y = T_norm, group = idx)) +
+  geom_line(alpha = 0.3) +
+  ggtitle("T_norm vs Channel Location, grouped by Simulation Run (idx)") +
   theme_minimal()
 ```
 
@@ -350,7 +348,7 @@ mse(fit_nonphysical, df_psaap)
 **Observations**:
 
 - Which model is *most accurate*? Which is *least accurate*?
-  - `fit_cheat` is the most accurate; `fit_baseline` is the least
+  - `fit_cheat` is the most accurate; `fit_nonphysical` is the least
     accurate.
 - What *Category* of variable is `avg_T`? Why is it such an effective
   predictor?
@@ -615,8 +613,9 @@ bind_rows(
   - q4 model is much more confident.
 - How many predictors does the `fit_simple` model need in order to make
   a prediction? What about your model `fit_q4`?
-  - `fit_simple` only uses 1 prediction, `x`, whereas `fit_q4` uses 4
-    predictions, `idx`, `avg_q`, `avg_T`, and `rms_T`.
+  - `fit_simple` only uses 1 prediction, `x`, whereas `fit_q4` uses
+    every predictor but `idx`, `avg_q`, `avg_T`, and `rms_T`. This means
+    fit_q4 uses 17 predictors.
 
 Based on these results, you might be tempted to always throw every
 reasonable variable into the model. For some cases, that might be the
